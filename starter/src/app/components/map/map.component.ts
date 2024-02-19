@@ -12,6 +12,9 @@ import { register } from 'ol/proj/proj4';
 import { Map as OpenMap, View } from 'ol';
 import OSM from 'ol/source/OSM.js';
 import TileLayer from 'ol/layer/Tile';
+import VectorSource from 'ol/source/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
+import VectorLayer from 'ol/layer/Vector';
 
 @Component({
   selector: 'starter-map',
@@ -35,12 +38,21 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   private initMap() {
+    const vectorSource = new VectorSource({
+      url: '../assets/vegetation-datawa.geojson', // Path to your GeoJSON file
+      format: new GeoJSON(),
+    });
+
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+    });
+
+    const tileLayer = new TileLayer({
+      source: new OSM(),
+    });
+
     this.mapComponent = new OpenMap({
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
+      layers: [tileLayer, vectorLayer],
       target: this.mapContainer.nativeElement,
       maxTilesLoading: 64,
       view: new View({
