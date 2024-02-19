@@ -1,17 +1,12 @@
-import { AfterContentInit, Component } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MapComponent } from 'src/app/components/map/map.component';
-import { MatDialog } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { FooterComponent } from 'src/app/components/footer/footer.component';
 
 @Component({
-  selector: 'starter-landing',
+  selector: 'landing-page',
   standalone: true,
-  imports: [MatCardModule, MapComponent],
+  imports: [HeaderComponent, FooterComponent],
   templateUrl: './landing.component.html',
   styles: ``,
 })
-export class LandingComponent implements AfterContentInit {
-  constructor(public dialog: MatDialog) {}
-
-  ngAfterContentInit(): void {}
-}
+export class LandingComponent {}

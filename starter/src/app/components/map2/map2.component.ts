@@ -6,8 +6,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-
 import { useGeographic } from 'ol/proj';
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
@@ -17,17 +15,15 @@ import TileLayer from 'ol/layer/Tile';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorLayer from 'ol/layer/Vector';
-import { HeaderComponent } from '../header/header.component';
-import { FooterComponent } from '../footer/footer.component';
 
 @Component({
-  selector: 'vegetation-map',
+  selector: 'map2',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './map.component.html',
+  templateUrl: './map2.component.html',
   styles: ``,
 })
-export class MapComponent implements OnInit, AfterViewInit {
+export class Map2Component implements OnInit, AfterViewInit {
   @ViewChild('mapContainer', { static: true })
   mapContainer!: ElementRef<HTMLElement>;
   mapComponent: OpenMap | undefined;
@@ -43,7 +39,7 @@ export class MapComponent implements OnInit, AfterViewInit {
 
   private initMap() {
     const vectorSource = new VectorSource({
-      url: '../assets/vegetation-datawa.geojson',
+      url: '../assets/vegetation-datawa.geojson', // Path to your GeoJSON file
       format: new GeoJSON(),
     });
 
