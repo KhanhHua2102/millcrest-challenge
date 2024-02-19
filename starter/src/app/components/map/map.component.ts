@@ -6,19 +6,18 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
+import { HttpClient } from '@angular/common/http';
 
 import { useGeographic } from 'ol/proj';
-import proj4 from 'proj4';
-import { register } from 'ol/proj/proj4';
-import { Map as OpenMap, View } from 'ol';
+import { Map, Map as OpenMap, View } from 'ol';
 import OSM from 'ol/source/OSM.js';
 import TileLayer from 'ol/layer/Tile';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorLayer from 'ol/layer/Vector';
-import { HeaderComponent } from '../header/header.component';
-import { FooterComponent } from '../footer/footer.component';
+import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
+
+import { GeoJsonService } from 'src/app/loadGeoJson.service';
 
 @Component({
   selector: 'vegetation-map',
@@ -30,11 +29,14 @@ import { FooterComponent } from '../footer/footer.component';
 export class MapComponent implements OnInit, AfterViewInit {
   @ViewChild('mapContainer', { static: true })
   mapContainer!: ElementRef<HTMLElement>;
-  mapComponent: OpenMap | undefined;
+  mapComponent!: OpenMap;
+  geoJsonData: GeoJSON = new GeoJSON();
+  http!: HttpClient;
+
+  constructor(private geoJsonService: GeoJsonService, http: HttpClient) {}
 
   ngOnInit() {
     useGeographic();
-    this.registerProjections();
   }
 
   ngAfterViewInit() {
@@ -42,31 +44,66 @@ export class MapComponent implements OnInit, AfterViewInit {
   }
 
   private initMap() {
-    const vectorSource = new VectorSource({
-      url: '../assets/vegetation-datawa.geojson',
-      format: new GeoJSON(),
-    });
-
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
-    });
+    const centerCoordinates = [133.775136, -25.274399]; // Center of Australia
 
     const tileLayer = new TileLayer({
       source: new OSM(),
     });
 
-    this.mapComponent = new OpenMap({
-      layers: [tileLayer, vectorLayer],
+    this.mapComponent = new Map({
+      layers: [tileLayer],
       target: this.mapContainer.nativeElement,
-      maxTilesLoading: 64,
       view: new View({
-        center: [0, 0],
-        zoom: 2,
+        center: centerCoordinates,
+        zoom: 4,
       }),
+    });
+
+    this.loadGeoJSON();
+  }
+
+  private loadGeoJSON() {
+    this.geoJsonService.loadGeoJSON().subscribe({
+      next: (data) => {
+        console.log('GeoJSON loaded:', data);
+        this.addVectorLayer(data);
+        // TODO: add more records into GEOJSON file from 30000 line
+      },
+      error: (error) => {
+        console.error('Error loading GeoJSON:', error);
+      },
+      complete: () => {
+        console.log('GeoJSON loading completed');
+      },
     });
   }
 
-  registerProjections() {
-    register(proj4);
+  private addVectorLayer(geojsonData: any) {
+    if (geojsonData === null) {
+      console.error('GeoJSON data is null');
+      return;
+    }
+    const styles = {
+      MultiPolygon: new Style({
+        stroke: new Stroke({
+          color: 'green',
+          width: 2,
+        }),
+        fill: new Fill({
+          color: 'rgba(255, 255, 0, 0.1)',
+        }),
+      }),
+    };
+
+    const vectorSource = new VectorSource({
+      features: new GeoJSON().readFeatures(geojsonData),
+    });
+
+    const vectorLayer = new VectorLayer({
+      source: vectorSource as any,
+      style: styles['MultiPolygon'],
+    });
+
+    this.mapComponent.addLayer(vectorLayer);
   }
 }

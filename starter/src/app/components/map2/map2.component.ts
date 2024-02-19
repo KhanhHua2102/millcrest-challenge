@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -5,19 +6,22 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { useGeographic } from 'ol/proj';
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
 import { Map as OpenMap, View } from 'ol';
 import OSM from 'ol/source/OSM.js';
 import TileLayer from 'ol/layer/Tile';
-import VectorSource from 'ol/source/Vector';
-import GeoJSON from 'ol/format/GeoJSON';
+import GeoTIFF from 'ol/source/GeoTIFF';
 import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
+import Style from 'ol/style/Style';
 
 @Component({
-  selector: 'map2',
+  selector: 'SLGA-map',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './map2.component.html',
@@ -38,26 +42,44 @@ export class Map2Component implements OnInit, AfterViewInit {
   }
 
   private initMap() {
-    const vectorSource = new VectorSource({
-      url: '../assets/vegetation-datawa.geojson', // Path to your GeoJSON file
-      format: new GeoJSON(),
-    });
+    const centerCoordinates = [133.775136, -25.274399]; // Center of Australia
 
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
+    const rasterSource = new GeoTIFF({
+      sources: [
+        {
+          url: 'https://apikey:NklvVXE3NWhvQ1piTHUzZC5nV31jLlE/aE4oZnddcSIkdk0mW3N9Um5PVEY5IUtNX0cqQEk6fnBmPzIpJHxFay5xVj8mXi1iayZiZlZLMU1y@data.tern.org.au/landscapes/slga/NationalMaps/SoilAndLandscapeGrid/AWC/AWC_000_005_EV_N_P_AU_TRN_N_20210614.tif',
+        },
+      ],
     });
 
     const tileLayer = new TileLayer({
       source: new OSM(),
     });
 
+    const rasterLayer = new TileLayer({
+      source: rasterSource,
+    });
+
+    const vectorLayer = new VectorLayer({
+      source: new VectorSource(),
+      style: new Style({
+        fill: new Fill({
+          color: 'rgba(255, 0, 0, 0.9)', // Red color with 20% opacity
+        }),
+        stroke: new Stroke({
+          color: 'red', // Red color
+          width: 2, // Stroke width
+        }),
+      }),
+    });
+
     this.mapComponent = new OpenMap({
-      layers: [tileLayer, vectorLayer],
+      layers: [tileLayer, rasterLayer, vectorLayer],
       target: this.mapContainer.nativeElement,
       maxTilesLoading: 64,
       view: new View({
-        center: [0, 0],
-        zoom: 2,
+        center: centerCoordinates,
+        zoom: 4,
       }),
     });
   }
