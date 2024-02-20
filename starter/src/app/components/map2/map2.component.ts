@@ -8,17 +8,10 @@ import {
 } from '@angular/core';
 
 import { useGeographic } from 'ol/proj';
-import proj4 from 'proj4';
-import { register } from 'ol/proj/proj4';
-import { Map as OpenMap, View } from 'ol';
+import { Map, Map as OpenMap, View } from 'ol';
 import OSM from 'ol/source/OSM.js';
-import TileLayer from 'ol/layer/Tile';
-import GeoTIFF from 'ol/source/GeoTIFF';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import Fill from 'ol/style/Fill';
-import Stroke from 'ol/style/Stroke';
-import Style from 'ol/style/Style';
+import TileLayer from 'ol/layer/WebGLTile.js';
+import { GeoTIFFService } from 'src/app/services/loadGeoTiff.service';
 
 @Component({
   selector: 'SLGA-map',
@@ -30,61 +23,51 @@ import Style from 'ol/style/Style';
 export class Map2Component implements OnInit, AfterViewInit {
   @ViewChild('mapContainer', { static: true })
   mapContainer!: ElementRef<HTMLElement>;
-  mapComponent: OpenMap | undefined;
+  mapComponent!: Map;
+
+  constructor(private loadGeoTIFF: GeoTIFFService) {}
 
   ngOnInit() {
     useGeographic();
-    this.registerProjections();
   }
 
   ngAfterViewInit() {
     this.initMap();
   }
 
-  private initMap() {
+  private async initMap() {
     const centerCoordinates = [133.775136, -25.274399]; // Center of Australia
 
-    const rasterSource = new GeoTIFF({
-      sources: [
-        {
-          url: 'https://apikey:NklvVXE3NWhvQ1piTHUzZC5nV31jLlE/aE4oZnddcSIkdk0mW3N9Um5PVEY5IUtNX0cqQEk6fnBmPzIpJHxFay5xVj8mXi1iayZiZlZLMU1y@data.tern.org.au/landscapes/slga/NationalMaps/SoilAndLandscapeGrid/AWC/AWC_000_005_EV_N_P_AU_TRN_N_20210614.tif',
-        },
-      ],
+    this.loadGeoTIFF.loadGeoTIFF().subscribe({
+      next: (data) => {
+        console.log('GeoJSON loaded:', data);
+        const geoTiffObject = data;
+      },
     });
 
     const tileLayer = new TileLayer({
       source: new OSM(),
     });
 
-    const rasterLayer = new TileLayer({
-      source: rasterSource,
-    });
-
-    const vectorLayer = new VectorLayer({
-      source: new VectorSource(),
-      style: new Style({
-        fill: new Fill({
-          color: 'rgba(255, 0, 0, 0.9)', // Red color with 20% opacity
-        }),
-        stroke: new Stroke({
-          color: 'red', // Red color
-          width: 2, // Stroke width
-        }),
-      }),
-    });
-
-    this.mapComponent = new OpenMap({
-      layers: [tileLayer, rasterLayer, vectorLayer],
+    this.mapComponent = new Map({
+      layers: [tileLayer],
       target: this.mapContainer.nativeElement,
-      maxTilesLoading: 64,
       view: new View({
         center: centerCoordinates,
         zoom: 4,
       }),
     });
-  }
 
-  registerProjections() {
-    register(proj4);
+    this.loadGeoTIFF.loadGeoTIFF().subscribe({
+      next: (data) => {
+        console.log('GeoJSON loaded:', data);
+        const geoTiffObject = data;
+        const rasterLayer = new TileLayer({
+          source: geoTiffObject as any,
+        });
+
+        this.mapComponent.addLayer(rasterLayer);
+      },
+    });
   }
 }
