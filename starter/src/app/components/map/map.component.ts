@@ -17,7 +17,7 @@ import GeoJSON from 'ol/format/GeoJSON';
 import VectorLayer from 'ol/layer/Vector';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style.js';
 
-import { GeoJsonService } from 'src/app/loadGeoJson.service';
+import { GeoJsonService } from 'src/app/services/loadGeoJson.service';
 
 @Component({
   selector: 'vegetation-map',
@@ -65,9 +65,8 @@ export class MapComponent implements OnInit, AfterViewInit {
   private loadGeoJSON() {
     this.geoJsonService.loadGeoJSON().subscribe({
       next: (data) => {
-        console.log('GeoJSON loaded:', data);
+        console.log('GeoJSON loaded');
         this.addVectorLayer(data);
-        // TODO: add more records into GEOJSON file from 30000 line
       },
       error: (error) => {
         console.error('Error loading GeoJSON:', error);

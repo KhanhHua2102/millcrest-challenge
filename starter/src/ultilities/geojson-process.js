@@ -1,37 +1,33 @@
 const fs = require('fs');
-const readline = require('readline');
+const path = require('path');
 
-// Define the input and output file paths
-const inputFile = 'src/assets/vegetation-datawa.geojson';
-const outputFile = 'src/assets/vegetation-datawa1.geojson';
+const inputFilePath = 'src/assets/vegetation-datawa.geojson';
+const outputDir = 'src/assets/chunks/';
+const featuresPerChunk = 1000;
 
-// Create a read stream for the input file
-const readStream = fs.createReadStream(inputFile);
+let geoJsonData = JSON.parse(fs.readFileSync(inputFilePath, 'utf8'));
+let features = geoJsonData.features;
 
-// Create a write stream for the output file
-const writeStream = fs.createWriteStream(outputFile);
+let fileIndex = 0;
+let currentChunk = {
+  type: 'FeatureCollection',
+  features: [],
+};
 
-// Create an interface to read the input file line by line
-const rl = readline.createInterface({
-  input: readStream,
-  output: writeStream, // Write to output file
-});
+for (let i = 0; i < features.length; i++) {
+  currentChunk.features.push(features[i]);
 
-// Event listener for reading lines
-rl.on('line', (line) => {
-  // Parse the JSON object from the line
-  const features = JSON.parse(line);
+  if (
+    currentChunk.features.length >= featuresPerChunk ||
+    i === features.length - 1
+  ) {
+    const outputFile = path.join(outputDir, `chunk_${fileIndex}.geojson`);
+    fs.writeFileSync(outputFile, JSON.stringify(currentChunk, null, 2));
+    console.log(`Chunk ${fileIndex} written to ${outputFile}`);
 
-  delete features.name;
+    fileIndex++;
+    currentChunk.features = [];
+  }
+}
 
-  // Convert the modified feature back to JSON string
-  const modifiedLine = JSON.stringify(feature);
-
-  // Write the modified line to the output file
-  writeStream.write(modifiedLine + '\n');
-});
-
-// Event listener for when all lines have been read
-rl.on('close', () => {
-  console.log('Properties removed successfully!');
-});
+console.log('Splitting completed.');
