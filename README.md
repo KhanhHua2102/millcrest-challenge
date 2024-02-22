@@ -1,29 +1,26 @@
-# Millcrest Fullstack Developer Challenge
+# Openlayers implemented Angular Web Application
 
-## Overview
-Welcome to the Millcrest Fullstack Developer Challenge. 
+## About The Project
 
-This challenge is designed to test your skills in developing an Angular user interface, using OpenLayers, and examine your thinking around integrating novel data sources.
+This web application is an implementation of the Openlayers map library in an Angular framework with TailwindCSS library on the frontend. The application is a map viewer that integrates environmental data sources, such as GeoJson file and Cloud GeoTiff (COG) APIs into the map viewer. The user interface is developed around the map and data, and methods for users to examine the data within the application.
 
-### Data Sources
+## Data Sources
+
 - **Vegetation Data**: [data.wa.gov.au Vegetation](https://catalogue.data.wa.gov.au/dataset/?theme=Environment&tags=Vegetation&access_level=open&res_format=API+ArcGIS+Server+Map+Service&res_format=WMS&res_format=GeoJSON)
 - **Soil Landscape Grid of Australia**: [eSoil.io TERN Landscapes](https://esoil.io/TERNLandscapes/Public/Pages/SLGA/)
 
-## Challenge Requirements
-1. **Map Viewer Integration**: Integrate some of the provided environmental data sources into the map viewer.
-2. **UI Development**: Create a user interface around the map and data.
-3. **Data Exploration**: Develop methods for users to examine the data within the application.
+### Built With
 
-## Bonus
-- **Time Series Data**: How would you incorporate time series data to add historical context to your maps.
-- **Statistical Analysis**: Implement statistical analysis or data correlations to uncover insights from the data.
+- [![Angular][Angular-badge]][Angular-url]
+- [![TailwindCSS][TailwindCSS-badge]][TailwindCSS-url]
+- [![Openlayers][Openlayers-badge]][Openlayers-url]
 
-## Submission Guidelines
-- Ensure your application meets all the listed requirements.
-- Submit your project by pushing your repository to GitHub and replying to the email with the link before the deadline.
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-## Questions?
-For any questions or clarifications, feel free to reach out to us by replying to the Challenge email.
-
-Best of luck,
-The Millcrest Hiring Team
+[Angular-badge]: https://img.shields.io/badge/Angular-%23DD0031.svg?style=for-the-badge&logo=angular&logoColor=white
+[Angular-url]: https://angular.io
+[TailwindCSS-badge]: https://img.shields.io/badge/TailwindCSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white
+[TailwindCSS-url]: https://tailwindcss.com
+[Openlayers-badge]: https://img.shields.io/badge/Openlayers-%23000000.svg?style=for-the-badge&logo=openlayers&logoColor=white
+[Openlayers-url]: https://openlayers.org
